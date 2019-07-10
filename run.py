@@ -1,27 +1,34 @@
-from games.game import Game
-import time
-from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from agents.wolf_agent import WoLFAgent
-from agents.policy import NormalPolicy
-from games.simple_game import SimpleGame
+from wolf_agent import WoLFAgent 
+from matrix_game import MatrixGame
+import pandas as pd
 
 if __name__ == '__main__':
+    nb_episode = 1000
 
-    nb_agents = 2
-    agents = []
-    for idx in range(nb_agents):
-        policy = NormalPolicy()
-        agent = WoLFAgent(alpha=0.1, policy=policy, action_list=np.arange(2))  # agentの設定
-        agents.append(agent)
+    actions = np.arange(2)
+    agent1 = WoLFAgent(alpha=0.1, actions=actions, high_delta=0.0004, low_delta=0.0002) 
+    agent2 = WoLFAgent(alpha=0.1, actions=actions, high_delta=0.0004, low_delta=0.0002)
 
-    game = SimpleGame(nb_steps=100000, agents=agents)
-    game.run()
-    for idx, agent in enumerate(agents):
-        print("agent{}s average reward:{}".format(idx, np.mean(agent.rewards)))
-    plt.plot(np.arange(len(agents[0].pi_history)),agents[0].pi_history)
-    plt.ylabel("Probability of selecting Heads")
-    plt.xlabel("Step")
+    game = MatrixGame()
+    for episode in range(nb_episode):
+        action1 = agent1.act()
+        action2 = agent2.act()
+
+        _, r1, r2 = game.step(action1, action2)
+
+        agent1.observe(reward=r1)
+        agent2.observe(reward=r2)
+
+    print(agent1.pi)
+    print(agent2.pi)
+    plt.plot(np.arange(len(agent1.pi_history)),agent1.pi_history, label="agent1's pi(0)")
+    plt.plot(np.arange(len(agent2.pi_history)),agent2.pi_history, label="agent2's pi(0)")
+
     plt.ylim(0, 1)
+    plt.xlabel("episode")
+    plt.ylabel("pi(0)")
+    plt.legend()
+    plt.savefig("result.jpg")
     plt.show()
