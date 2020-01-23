@@ -15,3 +15,5 @@ git clone https://github.com/tocom242242/wolf_phc.git
 python run.py
 ```
 
+## blog(japanese)
+https://www.tcom242242.net/entry/2018/07/16/182111/#toc5
